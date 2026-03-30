@@ -1,1 +1,1 @@
-web: gunicorn proctoring_system.wsgi
+web: gunicorn proctoring_system.wsgi --timeout 120
