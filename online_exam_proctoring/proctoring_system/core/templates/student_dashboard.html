@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 space-y-4">
+        <div class="glass-card">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-muted mb-6" style="color: hsl(var(--text-muted));">Quick Menu</h3>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'dashboard' %}" class="btn btn-ghost w-full" style="justify-content: flex-start; background: hsla(var(--p) / 0.1); color: #fff; border-color: hsla(var(--p) / 0.2);">
+                        🏠 <span>My Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}" class="btn btn-ghost w-full" style="justify-content: flex-start;">
+                        🚪 <span>Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="glass-card" style="border-left: 4px solid hsl(var(--p));">
+            <h4 class="text-xs font-bold uppercase text-muted mb-2" style="color: hsl(var(--text-muted));">Status</h4>
+            <div class="flex items-center gap-2">
+                <span class="badge badge-success">Online</span>
+                <span class="text-xs text-muted">Active Session</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 space-y-8">
+        <div class="glass-card" style="padding: 2rem;">
+            <div class="page-header" style="margin-bottom: 0;">
+                <div>
+                    <h2 class="page-title">Welcome Back, <span style="color: hsl(var(--p));">{{ user.username }}</span></h2>
+                    <p class="page-subtitle">You have {{ exams.count|default:0 }} pending exams. Good luck!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Exams Section -->
+        <div class="glass-card" style="padding: 0; overflow: hidden;">
+            <div class="p-4 border-b border-gray-700 bg-white bg-opacity-5 flex justify-between items-center">
+                <h3 class="text-lg font-bold">📚 Available Exams</h3>
+                <span class="badge badge-success">{{ exams.count|default:0 }} Active</span>
+            </div>
+            <div class="table-wrap" style="border: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Exam Title</th>
+                            <th>Description</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td style="font-weight: 700; color: #fff;">{{ exam.title }}</td>
+                            <td class="text-muted" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ exam.description|default:"Ready for assessment." }}
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="{% url 'take_exam' exam.id %}" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.75rem;">
+                                    🚀 Start Now
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="padding: 4rem; text-align: center;" class="text-muted">
+                                <i>No exams are currently available for you.</i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Results Section -->
+        <div class="glass-card" style="padding: 0; overflow: hidden;">
+            <div class="p-4 border-b border-gray-700 bg-white bg-opacity-5 flex justify-between items-center">
+                <h3 class="text-lg font-bold">📊 My Performance</h3>
+                <span class="badge badge-warning" style="background: hsla(var(--p)/.1); color: hsl(var(--p));">History</span>
+            </div>
+            <div class="table-wrap" style="border: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Exam</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                            <th style="text-align: right;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in results %}
+                        <tr>
+                            <td style="font-weight: 700;">{{ res.exam.title }}</td>
+                            <td>
+                                <span style="font-weight: 800; color: hsl(var(--success));">{{ res.score }}</span>
+                                <span class="text-muted" style="font-size: 0.75rem;">/ {{ res.total_questions|default:"-" }}</span>
+                            </td>
+                            <td class="text-muted">{{ res.submitted_at|date:"M d, Y" }}</td>
+                            <td style="text-align: right;">
+                                {% if res.status == 'Terminated' %}
+                                <span class="badge badge-danger">Terminated</span>
+                                {% else %}
+                                <span class="badge badge-success">Completed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 3rem; text-align: center;" class="text-muted italic">
+                                <i>No past results found.</i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,240 @@
+:root {
+    /* Color Palette — HSL for better control */
+    --p: 245 82% 67%;       /* Primary: Indigo */
+    --ph: 245 82% 57%;      /* Primary Hover */
+    --s: 262 83% 65%;       /* Secondary: Violet */
+    --dark: 222 47% 7%;     /* Deepest Navy */
+    --card: 222 47% 11%;    /* Card Background */
+    --border: 222 47% 18%;  /* subtle borders */
+    --text: 210 40% 98%;    /* Off-white */
+    --text-muted: 215 16% 58%;
+    --danger: 0 84% 60%;
+    --success: 142 71% 45%;
+
+    /* Elevations & Glass */
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glow: rgba(99, 102, 241, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: hsl(var(--dark));
+    background-image:
+        radial-gradient(at 0% 0%, hsla(var(--p) / 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(var(--s) / 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: hsl(var(--text));
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* ─── Global Layout ───────────────────────────────────────── */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ─── Navigation ──────────────────────────────────────────── */
+.navbar {
+    background: hsla(var(--dark) / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.85rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+.navbar-brand span { color: hsl(var(--p)); }
+
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-links a {
+    color: hsl(var(--text-muted));
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.nav-links a:hover { color: #fff; }
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0.85rem;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 99px;
+    font-size: 0.8rem;
+    color: hsl(var(--text-muted));
+}
+.nav-user b { color: #fff; }
+
+/* ─── Cards & Containers ──────────────────────────────────── */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover { border-color: hsla(var(--p) / 0.3); }
+
+.page-header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.page-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px; }
+.page-subtitle { color: hsl(var(--text-muted)); font-size: 0.9rem; }
+
+/* ─── Buttons ─────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, hsl(var(--p)), hsl(var(--s)));
+    color: white;
+    box-shadow: 0 4px 15px hsla(var(--p) / 0.35);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px hsla(var(--p) / 0.45);
+    filter: brightness(1.1);
+}
+
+.btn-ghost {
+    background: var(--glass);
+    color: hsl(var(--text));
+    border: 1px solid var(--glass-border);
+}
+.btn-ghost:hover { background: hsla(255, 255, 255, 0.08); color: #fff; }
+
+.btn-danger {
+    background: hsla(var(--danger) / 0.15);
+    color: hsl(var(--danger));
+    border: 1px solid hsla(var(--danger) / 0.3);
+}
+.btn-danger:hover { background: hsla(var(--danger) / 0.25); transform: translateY(-1px); }
+
+/* ─── Form Controls ───────────────────────────────────────── */
+.form-group { margin-bottom: 1.25rem; }
+.form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(var(--text-muted));
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    background: hsla(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-size: 0.925rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    background: hsla(var(--p) / 0.05);
+    border-color: hsl(var(--p));
+    box-shadow: 0 0 0 4px hsla(var(--p) / 0.15);
+}
+
+/* ─── Tables ──────────────────────────────────────────────── */
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+    background: hsla(var(--card) / 0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: hsla(255, 255, 255, 0.03);
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(var(--text-muted));
+    border-bottom: 1px solid var(--glass-border);
+}
+
+td {
+    padding: 1.15rem 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: hsla(255, 255, 255, 0.02); }
+
+/* ─── Badges ──────────────────────────────────────────────── */
+.badge {
+    padding: 0.25rem 0.65rem;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.badge-success { background: hsla(var(--success) / 0.15); color: hsl(var(--success)); }
+.badge-warning { background: hsla(38, 92%, 50%, 0.15); color: #fbbf24; }
+.badge-danger { background: hsla(var(--danger) / 0.15); color: hsl(var(--danger)); }
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .container { padding: 1rem; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .nav-links { display: none; } /* Mobile toggle should go here usually */
+}
+

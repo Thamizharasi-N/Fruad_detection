@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Exam Portal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-6 items-start">
+    <!-- Main Exam Area -->
+    <div class="flex-2 w-full lg:w-2/3 space-y-6">
+        <div class="bg-card p-6 rounded-lg shadow-lg border border-gray-700">
+            <h2 class="text-2xl font-bold text-white">{{ exam.title }}</h2>
+            <p class="text-gray-400 mt-2">{{ exam.description }}</p>
+        </div>
+
+        <div id="warning-area" class="hidden bg-red-500 bg-opacity-20 border border-red-500 text-red-100 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Alert!</strong>
+            <span class="block sm:inline" id="warning-text"></span>
+        </div>
+
+        <form method="post" id="exam-form" class="space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="time_taken" id="time_taken_input" value="00:00:00">
+            <input type="hidden" name="status" id="exam_status_input" value="Completed">
+            
+            {% for q in questions %}
+            <div class="bg-card p-6 rounded-lg shadow border border-gray-700">
+                <p class="text-lg font-medium text-white mb-4"><span class="text-primary font-bold">Q{{ forloop.counter }}:</span> {{ q.text }}</p>
+                <div class="space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="q_{{ q.id }}" value="A" class="form-radio h-4 w-4 text-primary bg-gray-700 border-gray-600 focus:ring-primary" required>
+                        <span class="text-gray-300">{{ q.option_a }}</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="q_{{ q.id }}" value="B" class="form-radio h-4 w-4 text-primary bg-gray-700 border-gray-600 focus:ring-primary" required>
+                        <span class="text-gray-300">{{ q.option_b }}</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="q_{{ q.id }}" value="C" class="form-radio h-4 w-4 text-primary bg-gray-700 border-gray-600 focus:ring-primary" required>
+                        <span class="text-gray-300">{{ q.option_c }}</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="q_{{ q.id }}" value="D" class="form-radio h-4 w-4 text-primary bg-gray-700 border-gray-600 focus:ring-primary" required>
+                        <span class="text-gray-300">{{ q.option_d }}</span>
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="flex justify-end pt-4">
+                <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-8 rounded shadow-lg transition duration-200"
+                    onclick="return confirm('Are you sure you want to submit your exam?');">
+                    Submit Exam
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Sidebar: Webcam & Info -->
+    <div class="flex-1 w-full lg:w-1/3 sticky top-6 space-y-6">
+        <!-- Timer Card -->
+        <div class="bg-card p-6 rounded-lg shadow-lg border border-gray-700 text-center">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2">Time Elapsed</h3>
+            <div id="exam-timer" class="text-4xl font-mono font-bold text-white">00:00:00</div>
+        </div>
+
+        <!-- Proctoring Panel -->
+        <div class="bg-card p-6 rounded-lg shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-white font-bold text-lg">Live Proctoring</h3>
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+            </div>
+            
+            <div class="relative rounded-lg overflow-hidden border-2 border-gray-600 mb-4 bg-black aspect-video flex items-center justify-center">
+                <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover transform scale-x-[-1]"></video>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-400 font-medium">Fraud Score</span>
+                        <span id="fraud-score-text" class="text-green-400 font-bold">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                        <div id="fraud-score-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="text-sm text-gray-400 bg-gray-800 p-3 rounded">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Keep your face visible</li>
+                        <li>No mobile phones or books</li>
+                        <li>Do not switch browser tabs</li>
+                        <li>Excessive noise is recorded</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/proctor.js' %}"></script>
+{% endblock %}

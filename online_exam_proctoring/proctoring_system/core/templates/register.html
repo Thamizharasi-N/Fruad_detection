@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% block title %}Register — ProctorSystem{% endblock %}
+
+{% block content %}
+<style>
+  /* ─── Page reset ─────────────────────────────────────────── */
+  body { background: #0a0f1e !important; }
+  .container { padding: 0 !important; max-width: 100% !important; }
+  nav.navbar { background: rgba(10,15,30,0.85) !important;
+               backdrop-filter: blur(12px) !important;
+               border-bottom: 1px solid rgba(99,102,241,.25) !important; }
+
+  /* ─── Full-viewport layout ───────────────────────────────── */
+  .auth-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background:
+      radial-gradient(ellipse 80% 60% at 80% 10%, rgba(99,102,241,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 60% at 20% 90%, rgba(167,139,250,.12) 0%, transparent 60%),
+      #0a0f1e;
+  }
+
+  /* ─── Card ───────────────────────────────────────────────── */
+  .auth-card {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 20px;
+    padding: 2.5rem 2.25rem 2rem;
+    box-shadow:
+      0 0 0 1px rgba(99,102,241,.15),
+      0 32px 80px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter: blur(24px);
+    animation: slideUp .45s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(28px) scale(.97); }
+    to   { opacity:1; transform:translateY(0)    scale(1);   }
+  }
+
+  /* ─── Logo / header ─────────────────────────────────────── */
+  .auth-logo {
+    display: flex; align-items: center;
+    justify-content: center; gap: .6rem;
+    margin-bottom: 1.5rem;
+  }
+  .auth-logo-icon {
+    width:42px; height:42px;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+    box-shadow: 0 4px 18px rgba(99,102,241,.45);
+  }
+  .auth-logo-text { font-size:1.35rem; font-weight:700; color:#fff; letter-spacing:-.5px; }
+  .auth-logo-text span { color:#818cf8; }
+
+  .auth-title     { text-align:center; font-size:1.5rem; font-weight:700; color:#f1f5f9; margin-bottom:.35rem; }
+  .auth-subtitle  { text-align:center; font-size:.85rem; color:#64748b; margin-bottom:1.75rem; }
+
+  /* ─── Role selector ──────────────────────────────────────── */
+  .role-selector {
+    display: flex;
+    gap: .75rem;
+    margin-bottom: 1.5rem;
+  }
+  .role-card {
+    flex: 1;
+    padding: .85rem .5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(255,255,255,.04);
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s;
+    position: relative;
+  }
+  .role-card:hover { border-color: rgba(99,102,241,.4); background:rgba(99,102,241,.07); }
+  .role-card input[type="radio"] {
+    position: absolute; opacity: 0; width:0; height:0;
+  }
+  .role-card.selected {
+    border-color: #6366f1;
+    background: rgba(99,102,241,.12);
+    box-shadow: 0 0 0 2px rgba(99,102,241,.25);
+  }
+  .role-icon { font-size: 1.6rem; margin-bottom: .3rem; }
+  .role-label { font-size: .8rem; font-weight: 600; color: #94a3b8; }
+  .role-card.selected .role-label { color: #a5b4fc; }
+
+  /* ─── Form fields ────────────────────────────────────────── */
+  .field-group { margin-bottom: 1.05rem; }
+  .field-label {
+    display:block; font-size:.8rem; font-weight:600;
+    color:#94a3b8; margin-bottom:.45rem;
+    letter-spacing:.4px; text-transform:uppercase;
+  }
+  .input-wrapper { position:relative; display:flex; align-items:center; }
+  .input-wrapper input,
+  .input-wrapper select {
+    width:100%; padding:.72rem 2.8rem .72rem 1rem;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.05);
+    color:#f1f5f9; font-size:.92rem;
+    outline:none; appearance:none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    font-family:inherit;
+  }
+  .input-wrapper input::placeholder { color:#475569; }
+  .input-wrapper input:focus,
+  .input-wrapper select:focus {
+    border-color:#6366f1;
+    background:rgba(99,102,241,.07);
+    box-shadow:0 0 0 3px rgba(99,102,241,.18);
+  }
+  .eye-btn {
+    position:absolute; right:.75rem;
+    background:none; border:none; cursor:pointer;
+    padding:0; color:#475569; font-size:1rem;
+    line-height:1; transition:color .2s;
+    display:flex; align-items:center;
+  }
+  .eye-btn:hover { color:#94a3b8; }
+
+  .field-error { font-size:.76rem; color:#f87171; margin-top:.3rem; }
+  .field-help  { font-size:.73rem; color:#475569; margin-top:.28rem; }
+
+  /* ─── Password strength bar ──────────────────────────────── */
+  .strength-bar-wrap {
+    height:4px; border-radius:2px;
+    background:rgba(255,255,255,.07);
+    margin-top:.5rem; overflow:hidden;
+    display:none;
+  }
+  .strength-bar {
+    height:100%; width:0; border-radius:2px;
+    transition: width .3s, background .3s;
+  }
+  .strength-label {
+    font-size:.72rem; color:#64748b;
+    margin-top:.25rem; display:none;
+  }
+
+  /* ─── Rules checklist ────────────────────────────────────── */
+  .rules-box {
+    display:none;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;
+    padding:.65rem .9rem;
+    margin-top:.5rem;
+    list-style:none;
+    gap:.3rem;
+    flex-direction:column;
+  }
+  .rules-box.show { display:flex; }
+  .rules-box li { font-size:.78rem; transition: color .2s; }
+  .rule-fail { color:#f87171; }
+  .rule-pass { color:#4ade80; }
+
+  /* ─── Non-field errors ───────────────────────────────────── */
+  .alert-error {
+    background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3);
+    border-radius:10px; padding:.7rem 1rem; margin-bottom:1rem;
+    font-size:.83rem; color:#fca5a5;
+  }
+
+  /* ─── Submit button ──────────────────────────────────────── */
+  .btn-submit {
+    width:100%; padding:.8rem; border:none; border-radius:10px;
+    font-size:.95rem; font-weight:700; cursor:pointer;
+    letter-spacing:.3px; margin-top:.35rem;
+    background:linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);
+    color:#fff; box-shadow:0 6px 24px rgba(99,102,241,.4);
+    transition:transform .15s, box-shadow .15s, filter .2s;
+    position:relative; overflow:hidden;
+  }
+  .btn-submit:hover { transform:translateY(-1px); filter:brightness(1.08); }
+  .btn-submit:active { transform:translateY(0); }
+
+  /* ─── Footer ─────────────────────────────────────────────── */
+  .auth-footer { text-align:center; margin-top:1.4rem; font-size:.84rem; color:#475569; }
+  .auth-footer a { color:#818cf8; text-decoration:none; font-weight:600; transition:color .2s; }
+  .auth-footer a:hover { color:#a5b4fc; text-decoration:underline; }
+
+  .divider {
+    display:flex; align-items:center; gap:.75rem;
+    margin:1.1rem 0; color:#334155; font-size:.75rem;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px; background:rgba(255,255,255,.07);
+  }
+
+  /* ─── Two-column row ─────────────────────────────────────── */
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+  @media(max-width:400px){ .field-row{ grid-template-columns:1fr; } }
+  @media(max-width:480px){ .auth-card{ padding:1.75rem 1.25rem 1.5rem; border-radius:16px; } }
+</style>
+
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🎓</div>
+      <div class="auth-logo-text">Proctor<span>System</span></div>
+    </div>
+
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-subtitle">Join ProctorSystem and get started today</p>
+
+    {% if form.non_field_errors %}
+    <div class="alert-error">
+      {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" id="registerForm" novalidate>
+      {% csrf_token %}
+
+      <!-- Role selector (maps to hidden role field if present) -->
+      <div class="role-selector" id="roleSelector">
+        <label class="role-card selected" id="card-student">
+          <input type="radio" name="role" value="student"
+                 checked onchange="selectRole(this)">
+          <div class="role-icon">👨‍🎓</div>
+          <div class="role-label">Student</div>
+        </label>
+        <label class="role-card" id="card-staff">
+          <input type="radio" name="role" value="staff"
+                 onchange="selectRole(this)">
+          <div class="role-icon">👨‍🏫</div>
+          <div class="role-label">Staff</div>
+        </label>
+      </div>
+
+      <!-- First & Last name on one row (if form has them) -->
+      <div class="field-row">
+        {% if form.first_name %}
+        <div class="field-group">
+          <label class="field-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="{{ form.first_name.id_for_label }}"
+                   name="{{ form.first_name.html_name }}"
+                   placeholder="First name"
+                   value="{{ form.first_name.value|default:'' }}">
+          </div>
+          <p class="field-error">{% for e in form.first_name.errors %}{{ e }}{% endfor %}</p>
+        </div>
+        {% endif %}
+        {% if form.last_name %}
+        <div class="field-group">
+          <label class="field-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="{{ form.last_name.id_for_label }}"
+                   name="{{ form.last_name.html_name }}"
+                   placeholder="Last name"
+                   value="{{ form.last_name.value|default:'' }}">
+          </div>
+          <p class="field-error">{% for e in form.last_name.errors %}{{ e }}{% endfor %}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Username -->
+      <div class="field-group">
+        <label class="field-label" for="{{ form.username.id_for_label }}">Username</label>
+        <div class="input-wrapper">
+          <input type="text" id="{{ form.username.id_for_label }}"
+                 name="{{ form.username.html_name }}"
+                 placeholder="Choose a username"
+                 autocomplete="username"
+                 value="{{ form.username.value|default:'' }}">
+        </div>
+        <p class="field-error">{% for e in form.username.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <!-- Email (if field exists) -->
+      {% if form.email %}
+      <div class="field-group">
+        <label class="field-label" for="{{ form.email.id_for_label }}">Email Address</label>
+        <div class="input-wrapper">
+          <input type="email" id="{{ form.email.id_for_label }}"
+                 name="{{ form.email.html_name }}"
+                 placeholder="you@example.com"
+                 autocomplete="email"
+                 value="{{ form.email.value|default:'' }}">
+        </div>
+        <p class="field-error">{% for e in form.email.errors %}{{ e }}{% endfor %}</p>
+      </div>
+      {% endif %}
+
+      <!-- Password 1 -->
+      <div class="field-group">
+        <label class="field-label" for="id_reg_password">Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="id_reg_password"
+                 name="{{ form.password1.html_name }}"
+                 placeholder="Create a strong password"
+                 autocomplete="new-password"
+                 oninput="checkStrength(this.value)"
+                 onfocus="document.getElementById('rules-box').classList.add('show')">
+          <button type="button" class="eye-btn"
+                  onclick="togglePassword('id_reg_password', this)"
+                  aria-label="Toggle password">👁</button>
+        </div>
+        <!-- Strength bar -->
+        <div class="strength-bar-wrap" id="strengthWrap">
+          <div class="strength-bar" id="strengthBar"></div>
+        </div>
+        <div class="strength-label" id="strengthLabel"></div>
+        <!-- Rules list -->
+        <ul class="rules-box" id="rules-box">
+          <li id="rule-length" class="rule-fail">✗ At least 8 characters</li>
+          <li id="rule-upper"  class="rule-fail">✗ At least one uppercase letter</li>
+          <li id="rule-digit"  class="rule-fail">✗ At least one number</li>
+          <li id="rule-special"class="rule-fail">✗ At least one special character (!@#…)</li>
+        </ul>
+        <p class="field-error">{% for e in form.password1.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <!-- Password 2 -->
+      <div class="field-group">
+        <label class="field-label" for="id_reg_password2">Confirm Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="id_reg_password2"
+                 name="{{ form.password2.html_name }}"
+                 placeholder="Confirm your password"
+                 autocomplete="new-password"
+                 oninput="checkMatch()">
+          <button type="button" class="eye-btn"
+                  onclick="togglePassword('id_reg_password2', this)"
+                  aria-label="Toggle confirm password">👁</button>
+        </div>
+        <p class="field-error" id="match-error">
+          {% for e in form.password2.errors %}{{ e }}{% endfor %}
+        </p>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn-submit">
+        Create Account →
+      </button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <p class="auth-footer">
+      Already have an account?&nbsp;
+      <a href="{% url 'login' %}">Sign in →</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /* ── Role card selection ─────────────────────────────── */
+  function selectRole(radio) {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    radio.closest('.role-card').classList.add('selected');
+  }
+
+  /* ── Password visibility toggle ─────────────────────── */
+  function togglePassword(id, btn) {
+    const el = document.getElementById(id);
+    el.type = (el.type === 'password') ? 'text' : 'password';
+    btn.textContent = (el.type === 'password') ? '👁' : '🙈';
+  }
+
+  /* ── Password strength checker ───────────────────────── */
+  function checkStrength(val) {
+    const wrap  = document.getElementById('strengthWrap');
+    const bar   = document.getElementById('strengthBar');
+    const label = document.getElementById('strengthLabel');
+
+    wrap.style.display  = 'block';
+    label.style.display = 'block';
+
+    const hasLength  = val.length >= 8;
+    const hasUpper   = /[A-Z]/.test(val);
+    const hasDigit   = /[0-9]/.test(val);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(val);
+
+    // Update rules UI
+    setRule('rule-length',  hasLength,  '8+ characters');
+    setRule('rule-upper',   hasUpper,   'Uppercase letter');
+    setRule('rule-digit',   hasDigit,   'Number');
+    setRule('rule-special', hasSpecial, 'Special character');
+
+    const score = [hasLength, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+    const levels = [
+      { pct:'15%', color:'#ef4444', text:'Very weak' },
+      { pct:'35%', color:'#f97316', text:'Weak' },
+      { pct:'60%', color:'#eab308', text:'Fair' },
+      { pct:'80%', color:'#22c55e', text:'Strong' },
+      { pct:'100%',color:'#10b981', text:'Very strong' },
+    ];
+    const lvl = levels[Math.min(score, 4)];
+    bar.style.width      = val.length ? lvl.pct : '0%';
+    bar.style.background = lvl.color;
+    label.style.color    = lvl.color;
+    label.textContent    = val.length ? lvl.text : '';
+  }
+
+  function setRule(id, pass, text) {
+    const el = document.getElementById(id);
+    el.className   = pass ? 'rule-pass' : 'rule-fail';
+    el.textContent = (pass ? '✓ ' : '✗ ') + text;
+  }
+
+  /* ── Confirm password mismatch check ─────────────────── */
+  function checkMatch() {
+    const p1    = document.getElementById('id_reg_password').value;
+    const p2    = document.getElementById('id_reg_password2').value;
+    const errEl = document.getElementById('match-error');
+    if (p2 && p1 !== p2) {
+      errEl.textContent = 'Passwords do not match.';
+    } else {
+      errEl.textContent = '';
+    }
+  }
+
+  /* ── Form submit guard ───────────────────────────────── */
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const p1 = document.getElementById('id_reg_password').value;
+    const p2 = document.getElementById('id_reg_password2').value;
+    if (p1 !== p2) {
+      e.preventDefault();
+      document.getElementById('match-error').textContent = 'Passwords do not match.';
+      document.getElementById('id_reg_password2').focus();
+    }
+  });
+</script>
+{% endblock %}

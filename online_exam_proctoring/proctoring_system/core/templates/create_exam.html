@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Create Exam{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="min-height: calc(100vh - 120px);">
+    <div class="glass-card" style="width: 100%; max-width: 600px; padding: 2.5rem;">
+        <h2 class="auth-title" style="text-align: left; margin-bottom: 0.5rem;">Create New Exam</h2>
+        <p class="auth-subtitle" style="text-align: left; margin-bottom: 2rem;">Define the parameters for your assessment.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                <div class="input-wrapper">
+                    {{ field }}
+                </div>
+                {% if field.errors %}
+                <p class="field-error">{% for error in field.errors %}{{ error }}{% endfor %}</p>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="field-help">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="flex items-center gap-6 mt-8">
+                <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2.5rem;">
+                    🚀 Create Exam
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-ghost" style="border: none;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        if(el.type !== 'submit' && el.type !== 'hidden') {
+            if(el.type === 'checkbox') {
+                 // Leave checkbox as-is or apply minor style
+            } else {
+                el.classList.add('form-control');
+            }
+        }
+    });
+</script>
+{% endblock %}

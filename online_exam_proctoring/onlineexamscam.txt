@@ -1,0 +1,37 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d # Required for 3D plotting
+import numpy as np
+# Prepare Data
+df = pd.DataFrame({
+"X": np.arange(10),
+"Y": np.random.rand(10) * 10,
+"Z": np.arange(10) * 2
+})
+# 1. Line Plot
+plt.figure(figsize=(6, 4))
+plt.plot(df["X"], df["Y"], marker='o', linestyle='--', color='blue', label='Y vs X Trend')
+plt.title("Line Plot: Random Trend")
+plt.xlabel("X Index")
+plt.ylabel("Y Value")
+plt.legend()
+plt.grid(True)
+plt.show()
+# 2. Scatter Plot
+plt.figure(figsize=(6, 4))
+plt.scatter(df["X"], df["Z"], c=df["Z"], cmap='viridis')
+plt.title("Scatter Plot: X vs Z")plt.xlabel("X")
+plt.ylabel("Z")
+plt.colorbar(label='Z Value')
+plt.show()
+# 3. 3D Plot
+fig = plt.figure(figsize=(7, 5))
+ax = fig.add_subplot(projection='3d') # Create 3D axes
+# Generate 3D line plot
+ax.plot3D(df["X"], df["Y"], df["Z"], 'red')
+ax.set_title("3D Line Plot")
+ax.set_xlabel("X Axis")
+ax.set_ylabel("Y Axis")
+ax.set_zlabel("Z Axis")
+plt.show()

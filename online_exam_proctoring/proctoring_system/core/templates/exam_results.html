@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Exam Reports - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center bg-card p-6 rounded-lg shadow-lg border border-gray-700">
+        <div>
+            <h2 class="text-2xl font-bold text-white">Reports: {{ exam.title }}</h2>
+            <p class="text-gray-400 text-sm mt-1">Comprehensive student activity and violation evidence</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="mt-4 md:mt-0 text-gray-400 hover:text-white transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Student Reports Table -->
+    <div class="bg-card rounded-lg shadow overflow-hidden border border-gray-700">
+        <div class="p-4 border-b border-gray-700 bg-gray-800">
+            <h3 class="text-lg font-semibold text-white">Student Activity Report</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-400">
+                <thead class="bg-gray-700 text-gray-300 text-xs uppercase">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 border-none">Student</th>
+                        <th scope="col" class="px-6 py-3 border-none text-center">Marks</th>
+                        <th scope="col" class="px-6 py-3 border-none text-center">Time Taken</th>
+                        <th scope="col" class="px-6 py-3 border-none text-center">Violations</th>
+                        <th scope="col" class="px-6 py-3 border-none text-center">Fraud Score</th>
+                        <th scope="col" class="px-6 py-3 border-none text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for res in results %}
+                    <tr class="hover:bg-gray-800 transition">
+                        <td class="px-6 py-4 font-medium text-white border-none">{{ res.student.username }}</td>
+                        <td class="px-6 py-4 text-center font-bold text-white border-none">{{ res.score }} / {{ res.total_questions }}</td>
+                        <td class="px-6 py-4 text-center border-none font-mono text-gray-300">{{ res.time_taken }}</td>
+                        <td class="px-6 py-4 text-center border-none">
+                            <span class="{% if res.violations_count > 0 %}text-red-400 font-bold{% else %}text-green-400{% endif %}">
+                                {{ res.violations_count }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center border-none">
+                            <span class="{% if res.fraud_score > 60 %}text-red-500 font-bold{% elif res.fraud_score > 20 %}text-yellow-500 font-bold{% else %}text-green-500{% endif %}">
+                                {{ res.fraud_score }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right border-none">
+                            {% if res.status == 'Terminated' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500 bg-opacity-20 text-red-400 border border-red-500 border-opacity-30">Terminated</span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-30">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500 italic border-none bg-gray-800 bg-opacity-50">No results submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Violations Evidence Table -->
+    <div class="bg-card rounded-lg shadow overflow-hidden border border-gray-700">
+        <div class="p-4 border-b border-gray-700 bg-gray-800">
+            <h3 class="text-lg font-semibold text-white">Violations Evidence Log</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-400">
+                <thead class="bg-gray-700 text-gray-300 text-xs uppercase">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 border-none">Student</th>
+                        <th scope="col" class="px-6 py-3 border-none">Violation Type</th>
+                        <th scope="col" class="px-6 py-3 border-none">Timestamp</th>
+                        <th scope="col" class="px-6 py-3 border-none text-right">Evidence</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for v in violations %}
+                    <tr class="hover:bg-gray-800 transition">
+                        <td class="px-6 py-4 font-medium text-white border-none">{{ v.student.username }}</td>
+                        <td class="px-6 py-4 border-none text-red-400">{{ v.violation_type }}</td>
+                        <td class="px-6 py-4 border-none">{{ v.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td class="px-6 py-4 text-right border-none">
+                            {% if v.evidence %}
+                            <a href="{{ v.evidence.url }}" target="_blank" class="text-primary hover:text-white underline transition">View Snapshot</a>
+                            {% else %}
+                            <span class="text-gray-500 italic">No Image</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 italic border-none bg-gray-800 bg-opacity-50">No violations recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ProctorSystem{% endblock %}</title>
+    {% load static %}
+    <!-- Link to existing style.css which we will keep for custom overrides -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        'primary-hover': '#4338ca',
+                        dark: '#111827',
+                        card: '#1f2937',
+                    }
+                }
+            }
+        }
+    </script>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'dashboard' %}" class="navbar-brand">Proctor<span>System</span></a>
+        
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <div class="nav-user">
+                    <span>Logged in as <b>{{ user.username }}</b></span>
+                    <span class="badge badge-success" style="font-size: 0.6rem; opacity: 0.8;">{{ user.role|title }}</span>
+                </div>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'logout' %}" class="btn btn-ghost" style="padding: 0.4rem 0.8rem;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary" style="padding: 0.4rem 1.2rem;">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

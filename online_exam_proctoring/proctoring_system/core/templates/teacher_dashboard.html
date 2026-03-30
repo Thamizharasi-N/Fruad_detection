@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 space-y-4">
+        <div class="glass-card">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-muted mb-6" style="color: hsl(var(--text-muted));">Quick Menu</h3>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'dashboard' %}" class="btn btn-ghost w-full" style="justify-content: flex-start; background: hsla(var(--p) / 0.1); color: #fff; border-color: hsla(var(--p) / 0.2);">
+                        📊 <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'create_exam' %}" class="btn btn-ghost w-full" style="justify-content: flex-start;">
+                        ➕ <span>Create Exam</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'all_reports' %}" class="btn btn-ghost w-full" style="justify-content: flex-start;">
+                        📝 <span>All Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}" class="btn btn-ghost w-full" style="justify-content: flex-start;">
+                        🚪 <span>Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 space-y-8">
+        <div class="glass-card" style="padding: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="page-title">Staff Dashboard</h2>
+                <p class="page-subtitle">Welcome back, <span style="color: hsl(var(--p));">{{ user.username }}</span>. System oversight active.</p>
+            </div>
+            <a href="{% url 'create_exam' %}" class="btn btn-primary">
+                + New Exam
+            </a>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card" style="border-bottom: 3px solid #3b82f6; padding: 1.25rem;">
+                <h4 class="text-xs font-bold uppercase text-muted tracking-tight" style="color: hsl(var(--text-muted));">Total Exams</h4>
+                <p class="text-2xl font-black mt-1" style="color: #fff;">{{ total_exams|default:"0" }}</p>
+            </div>
+            <div class="glass-card" style="border-bottom: 3px solid #10b981; padding: 1.25rem;">
+                <h4 class="text-xs font-bold uppercase text-muted tracking-tight" style="color: hsl(var(--text-muted));">Active Exams</h4>
+                <p class="text-2xl font-black mt-1" style="color: #fff;">{{ active_exams|default:"0" }}</p>
+            </div>
+            <div class="glass-card" style="border-bottom: 3px solid #a855f7; padding: 1.25rem;">
+                <h4 class="text-xs font-bold uppercase text-muted tracking-tight" style="color: hsl(var(--text-muted));">Total Students</h4>
+                <p class="text-2xl font-black mt-1" style="color: #fff;">{{ total_students|default:"0" }}</p>
+            </div>
+            <div class="glass-card" style="border-bottom: 3px solid #ef4444; padding: 1.25rem;">
+                <h4 class="text-xs font-bold uppercase text-muted tracking-tight" style="color: hsl(var(--text-muted));">Violations</h4>
+                <p class="text-2xl font-black mt-1" style="color: #fff;">{{ total_violations|default:"0" }}</p>
+            </div>
+        </div>
+
+        <!-- Exam Management Table -->
+        <div class="glass-card" style="padding: 0; overflow: hidden;">
+            <div class="p-4 border-b border-gray-700 bg-white bg-opacity-5">
+                <h3 class="text-lg font-bold">🛠 Exam Management</h3>
+            </div>
+            <div class="table-wrap" style="border: none; border-radius: 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Date / Schedule</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td style="font-weight: 700; color: #fff;">{{ exam.title }}</td>
+                            <td class="text-muted">{{ exam.date|default:"Rolling" }}</td>
+                            <td class="text-muted">{{ exam.duration }} min</td>
+                            <td>
+                                {% if exam.is_active %}
+                                <span class="badge badge-success">Active</span>
+                                {% else %}
+                                <span class="badge badge-danger" style="background: rgba(255,255,255,0.05); color: #666;">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{% url 'add_question' exam.id %}" class="btn btn-ghost" title="Questions" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">Q</a>
+                                    <a href="{% url 'view_results' exam.id %}" class="btn btn-ghost" title="Reports" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; color: #60a5fa;">R</a>
+                                    <a href="{% url 'edit_exam' exam.id %}" class="btn btn-ghost" title="Edit" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; color: #fbbf24;">E</a>
+                                    <a href="{% url 'delete_exam' exam.id %}" class="btn btn-danger" title="Delete" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">D</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding: 4rem; text-align: center;" class="text-muted italic">
+                                No exams created yet. <a href="{% url 'create_exam' %}" style="color: hsl(var(--p));">Create the first one →</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

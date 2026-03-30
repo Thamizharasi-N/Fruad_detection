@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% block title %}Login — ProctorSystem{% endblock %}
+
+{% block content %}
+<style>
+  /* ─── Page reset for auth pages ─────────────────────────── */
+  body { background: #0a0f1e !important; }
+  .container { padding: 0 !important; max-width: 100% !important; }
+  nav.navbar { background: rgba(10,15,30,0.85) !important;
+               backdrop-filter: blur(12px) !important;
+               border-bottom: 1px solid rgba(99,102,241,.25) !important; }
+
+  /* ─── Full-viewport centered layout ─────────────────────── */
+  .auth-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99,102,241,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 60% at 80% 90%, rgba(167,139,250,.12) 0%, transparent 60%),
+      #0a0f1e;
+  }
+
+  /* ─── Card ───────────────────────────────────────────────── */
+  .auth-card {
+    width: 100%;
+    max-width: 460px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 20px;
+    padding: 2.5rem 2.25rem 2rem;
+    box-shadow:
+      0 0 0 1px rgba(99,102,241,.15),
+      0 32px 80px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter: blur(24px);
+    animation: slideUp .45s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(28px) scale(.97); }
+    to   { opacity:1; transform:translateY(0)    scale(1);   }
+  }
+
+  /* ─── Logo / header ─────────────────────────────────────── */
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+  }
+  .auth-logo-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 18px rgba(99,102,241,.45);
+  }
+  .auth-logo-text {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.5px;
+  }
+  .auth-logo-text span { color: #818cf8; }
+
+  .auth-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: .35rem;
+  }
+  .auth-subtitle {
+    text-align: center;
+    font-size: .85rem;
+    color: #64748b;
+    margin-bottom: 1.75rem;
+  }
+
+  /* ─── Tab switcher ───────────────────────────────────────── */
+  .tab-switcher {
+    display: flex;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.75rem;
+    gap: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: .55rem .5rem;
+    border: none;
+    border-radius: 9px;
+    font-size: .84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    color: #64748b;
+    background: transparent;
+  }
+  .tab-btn.active-student {
+    background: linear-gradient(135deg,#6366f1,#7c3aed);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(99,102,241,.4);
+  }
+  .tab-btn.active-staff {
+    background: linear-gradient(135deg,#0ea5e9,#0284c7);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(14,165,233,.4);
+  }
+  .tab-btn:hover:not(.active-student):not(.active-staff) {
+    background: rgba(255,255,255,.06);
+    color: #94a3b8;
+  }
+
+  /* ─── Form ───────────────────────────────────────────────── */
+  .auth-form { display: none; }
+  .auth-form.form-visible {
+    display: block;
+    animation: fadeSlide .3s ease both;
+  }
+  @keyframes fadeSlide {
+    from { opacity:0; transform:translateX(8px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+
+  .field-group { margin-bottom: 1.1rem; }
+  .field-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: .45rem;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  /* Wrap input + eye-icon */
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrapper input {
+    width: 100%;
+    padding: .72rem 2.8rem .72rem 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.05);
+    color: #f1f5f9;
+    font-size: .92rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    font-family: inherit;
+  }
+  .input-wrapper input::placeholder { color: #475569; }
+  .input-wrapper input:focus {
+    border-color: #6366f1;
+    background: rgba(99,102,241,.07);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+  }
+  .input-wrapper input.staff-focus:focus {
+    border-color: #0ea5e9;
+    background: rgba(14,165,233,.07);
+    box-shadow: 0 0 0 3px rgba(14,165,233,.18);
+  }
+
+  /* Eye toggle button */
+  .eye-btn {
+    position: absolute;
+    right: .75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color .2s;
+    display: flex;
+    align-items: center;
+  }
+  .eye-btn:hover { color: #94a3b8; }
+
+  .field-error {
+    font-size: .76rem;
+    color: #f87171;
+    margin-top: .3rem;
+  }
+
+  /* Alert box (server errors) */
+  .alert-error {
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.3);
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    margin-bottom: 1rem;
+    font-size: .83rem;
+    color: #fca5a5;
+  }
+
+  /* ─── Submit button ──────────────────────────────────────── */
+  .btn-submit {
+    width: 100%;
+    padding: .8rem;
+    border: none;
+    border-radius: 10px;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .3px;
+    margin-top: .35rem;
+    transition: transform .15s, box-shadow .15s, filter .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit::after {
+    content:'';
+    position:absolute; inset:0;
+    background:rgba(255,255,255,0);
+    transition: background .2s;
+  }
+  .btn-submit:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .btn-submit:hover::after { background:rgba(255,255,255,.06); }
+  .btn-submit:active { transform: translateY(0); }
+
+  .btn-student {
+    background: linear-gradient(135deg,#6366f1 0%,#7c3aed 100%);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(99,102,241,.4);
+  }
+  .btn-staff {
+    background: linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(14,165,233,.35);
+  }
+
+  /* ─── Footer link ────────────────────────────────────────── */
+  .auth-footer {
+    text-align: center;
+    margin-top: 1.4rem;
+    font-size: .84rem;
+    color: #475569;
+  }
+  .auth-footer a {
+    color: #818cf8;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color .2s;
+  }
+  .auth-footer a:hover { color: #a5b4fc; text-decoration: underline; }
+
+  /* ─── Divider ────────────────────────────────────────────── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.1rem 0;
+    color: #334155;
+    font-size: .75rem;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1;
+    height:1px; background:rgba(255,255,255,.07);
+  }
+
+  /* ─── Responsive ─────────────────────────────────────────── */
+  @media(max-width:480px){
+    .auth-card{ padding:1.75rem 1.25rem 1.5rem; border-radius:16px; }
+  }
+</style>
+
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🎓</div>
+      <div class="auth-logo-text">Proctor<span>System</span></div>
+    </div>
+
+    <h1 class="auth-title">Welcome Back</h1>
+    <p class="auth-subtitle">Sign in to access your exam portal</p>
+
+    <!-- Tab Switcher -->
+    <div class="tab-switcher" role="tablist">
+      <button id="btn-student" class="tab-btn active-student"
+              onclick="showTab('student')" role="tab" aria-selected="true">
+        👨‍🎓 Student
+      </button>
+      <button id="btn-staff" class="tab-btn"
+              onclick="showTab('staff')" role="tab" aria-selected="false">
+        👨‍🏫 Staff
+      </button>
+    </div>
+
+    <!-- ── Student Login Form ─────────────────────────────── -->
+    <form id="form-student" class="auth-form form-visible"
+          method="post" action="{% url 'student_login' %}" autocomplete="on">
+      {% csrf_token %}
+
+      {% if form.non_field_errors and login_type == 'student' %}
+      <div class="alert-error">
+        {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Username -->
+      <div class="field-group">
+        <label class="field-label" for="s_username">Username</label>
+        <div class="input-wrapper">
+          <input type="text" id="s_username" name="username"
+                 placeholder="Enter your username"
+                 autocomplete="username"
+                 value="{{ form.username.value|default:'' }}">
+        </div>
+        <p class="field-error">{% for e in form.username.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label class="field-label" for="s_password">Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="s_password" name="password"
+                 placeholder="Enter your password"
+                 autocomplete="current-password">
+          <button type="button" class="eye-btn"
+                  onclick="togglePassword('s_password', this)"
+                  aria-label="Toggle password visibility">
+            👁
+          </button>
+        </div>
+        <p class="field-error">{% for e in form.password.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <button type="submit" class="btn-submit btn-student">
+        Sign In as Student →
+      </button>
+    </form>
+
+    <!-- ── Staff Login Form ───────────────────────────────── -->
+    <form id="form-staff" class="auth-form"
+          method="post" action="{% url 'staff_login' %}" autocomplete="on">
+      {% csrf_token %}
+
+      {% if form.non_field_errors and login_type == 'staff' %}
+      <div class="alert-error">
+        {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Username -->
+      <div class="field-group">
+        <label class="field-label" for="t_username">Username</label>
+        <div class="input-wrapper">
+          <input type="text" id="t_username" name="username"
+                 placeholder="Enter staff username"
+                 autocomplete="username"
+                 class="staff-focus"
+                 value="{{ form.username.value|default:'' }}">
+        </div>
+        <p class="field-error">{% for e in form.username.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label class="field-label" for="t_password">Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="t_password" name="password"
+                 placeholder="Enter staff password"
+                 autocomplete="current-password"
+                 class="staff-focus">
+          <button type="button" class="eye-btn"
+                  onclick="togglePassword('t_password', this)"
+                  aria-label="Toggle password visibility">
+            👁
+          </button>
+        </div>
+        <p class="field-error">{% for e in form.password.errors %}{{ e }}{% endfor %}</p>
+      </div>
+
+      <button type="submit" class="btn-submit btn-staff">
+        Sign In as Staff →
+      </button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <p class="auth-footer">
+      Don't have an account?&nbsp;
+      <a href="{% url 'register' %}">Create one free →</a>
+    </p>
+
+  </div><!-- /.auth-card -->
+</div><!-- /.auth-page -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /* ── Password visibility toggle ─────────────────────── */
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+      btn.setAttribute('aria-label', 'Hide password');
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁';
+      btn.setAttribute('aria-label', 'Show password');
+    }
+  }
+
+  /* ── Tab switcher ────────────────────────────────────── */
+  function showTab(tab) {
+    const studentForm = document.getElementById('form-student');
+    const staffForm   = document.getElementById('form-staff');
+    const btnStudent  = document.getElementById('btn-student');
+    const btnStaff    = document.getElementById('btn-staff');
+
+    if (tab === 'student') {
+      studentForm.classList.add('form-visible');
+      staffForm.classList.remove('form-visible');
+      btnStudent.className = 'tab-btn active-student';
+      btnStaff.className   = 'tab-btn';
+      btnStudent.setAttribute('aria-selected','true');
+      btnStaff.setAttribute('aria-selected','false');
+    } else {
+      staffForm.classList.add('form-visible');
+      studentForm.classList.remove('form-visible');
+      btnStaff.className   = 'tab-btn active-staff';
+      btnStudent.className = 'tab-btn';
+      btnStaff.setAttribute('aria-selected','true');
+      btnStudent.setAttribute('aria-selected','false');
+    }
+  }
+
+  /* ── Auto-open the correct tab on server-side error ─── */
+  const loginType = "{{ login_type|default:'student' }}";
+  showTab(loginType);
+</script>
+{% endblock %}
