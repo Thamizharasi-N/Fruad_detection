@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn proctoring_system.wsgi --timeout 120
+web: bash ./run.sh
