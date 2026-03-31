@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # run_app.sh
 
-# Run migrations at startup to ensure ephemeral disk is initialized
+# Exit immediately if any command fails
+set -o errexit
+
+echo "==> Running Django Migrations..."
 python manage.py migrate --noinput
 
-# Start the web server
+echo "==> Starting Gunicorn Application Server..."
 gunicorn proctoring_system.wsgi --timeout 120
